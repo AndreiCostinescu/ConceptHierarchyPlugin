@@ -1,6 +1,6 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# ConceptHierarchyPlugin Changelog
+# Concept Hierarchy Development Extensions Changelog
 
 ## [Unreleased]
 ### Added
