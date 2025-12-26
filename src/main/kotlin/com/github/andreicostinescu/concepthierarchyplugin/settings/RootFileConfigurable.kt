@@ -67,18 +67,18 @@ class RootFileConfigurable(private val project: Project) : Configurable {
 
         if (vf == null) {
             val baseMsg = projectBase?.path?.let { " relative to project root: $it" } ?: ""
-            throw ConfigurationException("Root JSON not found: '$text'$baseMsg")
+            throw ConfigurationException("The selected JSON file was not found: '$text'$baseMsg")
         }
 
         if (!vf.extension.equals("json", ignoreCase = true)) {
-            throw ConfigurationException("Selected file is not a JSON file: '${vf.name}'. Please choose a .json file.")
+            throw ConfigurationException("The selected file is not a JSON file: '${vf.name}'. Please choose a .json file.")
         }
 
         // Persist path as project-relative when possible
         val relative = if (projectBase != null) VfsUtilCore.getRelativePath(vf, projectBase, '/') else null
         val newRootPath = relative ?: vf.path
         settings.setRootPath(newRootPath)
-        this.rootField.text = newRootPath
+        this.rootField.text = newRootPath  // update the UI as well to reflect this updated relative path
     }
 
     override fun reset() {
