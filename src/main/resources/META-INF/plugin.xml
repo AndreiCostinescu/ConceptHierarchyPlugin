@@ -5,11 +5,31 @@
     <vendor>Andrei Costinescu</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.andreicostinescu.concepthierarchyplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.andreicostinescu.concepthierarchyplugin.startup.MyProjectActivity" />
+
+        <!-- Reference provider for "includes" strings -->
+        <psi.referenceContributor implementation="com.github.andreicostinescu.concepthierarchyplugin.references.JsonIncludeReferenceContributor"/>
+        <!-- Register a project service that builds/maintains the merged model -->
+        <projectService serviceImplementation="com.github.andreicostinescu.concepthierarchyplugin.services.ModelService"/>
+        <projectService serviceImplementation="com.github.andreicostinescu.concepthierarchyplugin.settings.RootFileSettings"/>
+        <!-- Settings -->
+        <projectConfigurable instance="com.github.andreicostinescu.concepthierarchyplugin.settings.RootFileConfigurable"/>
     </extensions>
+
+    <actions>
+        <!-- Context menu action in editor to mark a JSON file as root -->
+        <action id="SetJsonRootAction"
+                class="com.github.andreicostinescu.concepthierarchyplugin.actions.SetJsonRootAction"
+                text="Set as Concept Hierarchy root"
+                description="Use this JSON file as the root for Concept Hierarchy">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
