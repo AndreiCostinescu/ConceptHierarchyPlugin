@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.andreicostinescu.concepthierarchyplugin</id>
-    <name>ConceptHierarchyPlugin</name>
-    <vendor>andreicostinescu</vendor>
+    <name>Concept Hierarchy Plugin</name>
+    <vendor>Andrei Costinescu</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
