@@ -13,7 +13,7 @@
         <toolWindow factoryClass="com.github.andreicostinescu.concepthierarchyplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.andreicostinescu.concepthierarchyplugin.startup.MyProjectActivity" />
 
-        <!-- Reference provider for "includes" strings -->
+        <!-- Reference provider for "external" Concept Hierarchy data -->
         <psi.referenceContributor implementation="com.github.andreicostinescu.concepthierarchyplugin.references.JsonIncludeReferenceContributor"/>
         <!-- Register a project service that builds/maintains the merged model -->
         <projectService serviceImplementation="com.github.andreicostinescu.concepthierarchyplugin.services.ModelService"/>

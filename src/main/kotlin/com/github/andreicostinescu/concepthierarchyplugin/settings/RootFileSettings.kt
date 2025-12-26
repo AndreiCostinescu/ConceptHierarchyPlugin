@@ -10,8 +10,30 @@ import com.intellij.openapi.components.Storage
 class RootFileSettings : PersistentStateComponent<RootFileSettings.State> {
     data class State(
         var rootPath: String? = null,           // Project-relative or absolute path to the root JSON
-        var includePropertyName: String = "external"
-    )
+        var externalIncludeHeaderKeyword: String = "external",
+        var dataDefinitionKeyword: String = "data",
+        var contextWhereExternalFilesAreValid: Array<String> = arrayOf(externalIncludeHeaderKeyword, dataDefinitionKeyword, "header")
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as State
+
+            if (this.rootPath != other.rootPath) return false
+            if (this.externalIncludeHeaderKeyword != other.externalIncludeHeaderKeyword) return false
+            if (!this.contextWhereExternalFilesAreValid.contentEquals(other.contextWhereExternalFilesAreValid)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = this.rootPath?.hashCode() ?: 0
+            result = 31 * result + this.externalIncludeHeaderKeyword.hashCode()
+            result = 31 * result + this.contextWhereExternalFilesAreValid.contentHashCode()
+            return result
+        }
+    }
 
     private var state = State()
 
@@ -26,12 +48,5 @@ class RootFileSettings : PersistentStateComponent<RootFileSettings.State> {
 
     fun getRootPath(): String? = this.state.rootPath
 
-    fun getIncludePropertyName(): String = this.state.includePropertyName
-
-    /*
-    // This should not be set; the 'external' keyword is part of the Concept Hierarchy syntax, not modifiable
-    fun setIncludePropertyName(name: String) {
-        this.state.includePropertyName = name
-    }
-    */
+    fun getContextWhereExternalFilesAreValid(): Array<String> = this.state.contextWhereExternalFilesAreValid
 }

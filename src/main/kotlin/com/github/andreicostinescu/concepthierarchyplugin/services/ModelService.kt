@@ -28,7 +28,7 @@ class ModelService(private val project: Project) {
         val psiRoot = abs?.let { PsiManager.getInstance(project).findFile(it) as? JsonFile } ?: return
 
         ReadAction.run<RuntimeException> {
-            val includes = JsonIncludeResolver.findIncludes(psiRoot, settings.getIncludePropertyName())
+            val includes = JsonIncludeResolver.findIncludes(psiRoot)
             this.currentModel = Model(rootPath, includes.map { it.target?.path ?: it.path })
         }
     }
