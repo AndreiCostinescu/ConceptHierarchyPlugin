@@ -20,6 +20,9 @@
         <projectService serviceImplementation="com.github.andreicostinescu.concepthierarchyplugin.settings.RootFileSettings"/>
         <!-- Settings -->
         <projectConfigurable instance="com.github.andreicostinescu.concepthierarchyplugin.settings.RootFileConfigurable"/>
+
+        <!-- Start loading the ConceptHierarchy at startup -->
+        <postStartupActivity implementation="com.github.andreicostinescu.concepthierarchyplugin.startup.LoadConceptHierarchyAtStartup"/>
     </extensions>
 
     <actions>

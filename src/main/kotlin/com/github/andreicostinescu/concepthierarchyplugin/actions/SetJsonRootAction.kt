@@ -1,5 +1,6 @@
 package com.github.andreicostinescu.concepthierarchyplugin.actions
 
+import com.github.andreicostinescu.concepthierarchyplugin.services.ModelService
 import com.github.andreicostinescu.concepthierarchyplugin.settings.RootFileSettings
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -25,9 +26,15 @@ class SetJsonRootAction : DumbAwareAction("Set as Concept Hierarchy root") {
         val rel = if (projectBase != null) VfsUtilCore.getRelativePath(file, projectBase, '/')
         else file.path
         project.service<RootFileSettings>().setRootPath(rel ?: file.path)
+
+        // Trigger a model rebuild right away
+        project.service<ModelService>().rebuildModel()
+
         Messages.showInfoMessage(project, "Set root JSON:\n${rel ?: file.path}", "Concept Hierarchy")
     }
 
+    // one-liner:
+    // private fun selectedFile(e: AnActionEvent) = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: e.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY)?.firstOrNull()
     private fun selectedFile(e: AnActionEvent): VirtualFile? {
         // Editor popup
         e.getData(CommonDataKeys.VIRTUAL_FILE)?.let { return it }

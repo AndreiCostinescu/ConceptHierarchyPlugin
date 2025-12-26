@@ -18,7 +18,7 @@
 - [ ] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
 
 <!-- Plugin description -->
-This plugin enables autocomplete, type checking, reference resolution, highlighting, and error verification for the Concept Hierarchy framework for knowledge representation presented in [this paper](https://www.intechopen.com/journals/1/articles/545).
+This plugin enables autocomplete, type checking, reference resolution, highlighting, and error verification for the Concept Hierarchy framework for knowledge representation presented in this [research paper](https://www.intechopen.com/journals/1/articles/545).
 
 This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
 

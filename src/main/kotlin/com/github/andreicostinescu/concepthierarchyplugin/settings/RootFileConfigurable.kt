@@ -1,5 +1,6 @@
 package com.github.andreicostinescu.concepthierarchyplugin.settings
 
+import com.github.andreicostinescu.concepthierarchyplugin.services.ModelService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
@@ -50,6 +51,8 @@ class RootFileConfigurable(private val project: Project) : Configurable {
         // Allow clearing the root path
         if (text.isEmpty()) {
             settings.setRootPath(null)
+            // Rebuild (will no-op if no root)
+            project.service<ModelService>().rebuildModel();
             return
         }
 
@@ -79,6 +82,9 @@ class RootFileConfigurable(private val project: Project) : Configurable {
         val newRootPath = relative ?: vf.path
         settings.setRootPath(newRootPath)
         this.rootField.text = newRootPath  // update the UI as well to reflect this updated relative path
+
+        // Rebuild the model after successful validation/save
+        project.service<ModelService>().rebuildModel()
     }
 
     override fun reset() {
