@@ -19,9 +19,13 @@ class ModelService(private val project: Project) {
     @Volatile
     private var currentModel: Model? = null
 
-    fun rebuildModel() {
+    fun rebuildModel(changedFiles: Set<String>? = null) {
         val log = com.intellij.openapi.diagnostic.Logger.getInstance(ModelService::class.java)
-        log.warn("Rebuilding Concept Hierarchy...")
+        if (changedFiles == null) {
+            log.warn("Rebuilding Concept Hierarchy...")
+        } else {
+            log.warn("Should rebuild only parts of the Concept Hierarchy ${changedFiles.joinToString(", ")}")
+        }
 
         val settings = project.service<RootFileSettings>()
         val rootPath = settings.getRootPath() ?: return

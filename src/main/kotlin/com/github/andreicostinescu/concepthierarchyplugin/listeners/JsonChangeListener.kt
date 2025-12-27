@@ -29,14 +29,17 @@ class JsonChangeListener(private val project: Project) : BulkFileListener {
         model?.includedFiles?.forEach { interestingPaths.add(it) }
 
         // If any changed file matches, rebuild
-        val shouldRebuild = events.any { ev ->
+        val changedPaths = HashSet<String>()
+        for (ev in events) {
             val f: VirtualFile? = ev.file
-            f != null && f.extension.equals("json", ignoreCase = true) && interestingPaths.contains(f.path)
+            if (f != null && f.extension.equals("json", ignoreCase = true) && interestingPaths.contains(f.path)) {
+                changedPaths.add(f.path)
+            }
         }
 
-        if (shouldRebuild) {
+        if (changedPaths.isNotEmpty()) {
             DumbService.getInstance(project).runWhenSmart {
-                project.service<ModelService>().rebuildModel()
+                project.service<ModelService>().rebuildModel(changedPaths)
             }
         }
     }
