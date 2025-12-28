@@ -19,9 +19,11 @@ import com.intellij.psi.PsiManager
  */
 object JsonIncludeResolver {
     data class Include(
-        val path: String,                  // The literal path string as written in JSON
-        val target: VirtualFile?,          // Resolved target VirtualFile (null if unresolved)
-        val literal: JsonStringLiteral     // The PSI literal where the include/header was declared
+        val path: String,                 // The literal path string as written in JSON
+        val target: VirtualFile?,         // Resolved target VirtualFile (null if unresolved)
+        val targetJson: JsonFile?,        // Resolved target JsonFile (null if unresolved)
+        val literal: JsonStringLiteral?,  // The PSI literal where the include/header was declared
+        val isPartOfConcept: Boolean,     // true => included as "data"; "false" => included as "external"-file
     )
 
     /**
@@ -35,14 +37,18 @@ object JsonIncludeResolver {
      */
     fun findIncludes(
         root: JsonFile,
-        externalPropertyKeyword: String = "external",
-        dataPropertyKeyword: String = "data",
+        includeRootInResult: Boolean,
+        externalPropertyKeyword: String,
+        dataPropertyKeyword: String,
         includeHeader: Boolean = false,
         withLogging: Boolean = false,
     ): List<Include> {
         val project = root.project
         val psiManager = PsiManager.getInstance(project)
         val results = mutableListOf<Include>()
+        if (includeRootInResult) {
+            results.add(Include(root.virtualFile.path, root.virtualFile, root, null, false))
+        }
 
         val log = com.intellij.openapi.diagnostic.Logger.getInstance(ModelService::class.java)
 
@@ -50,12 +56,17 @@ object JsonIncludeResolver {
         val visited = LinkedHashSet<String>()
         val stack = ArrayDeque<JsonFile>()
 
-        fun enqueueIfJson(vf: VirtualFile?) {
-            if (vf == null) return
-            val url = vf.url
+        fun enqueueIfJson(path: JsonStringLiteral, target: VirtualFile?, isPartOfConcept: Boolean) {
+            if (target == null) return
+            val url = target.url
             if (!visited.add(url)) return
-            val psi = psiManager.findFile(vf) as? JsonFile ?: return
-            stack.addLast(psi)
+            val file = psiManager.findFile(target) as? JsonFile
+            if (file != null) {
+                results.add(Include(path.value, target, file, path, isPartOfConcept))
+                stack.addLast(file)
+            } else {
+                results.add(Include(path.value, target, null, path, isPartOfConcept))
+            }
         }
 
         // Seed traversal with the root file (mark visited so we don't attempt to "include" the root itself)
@@ -86,11 +97,10 @@ object JsonIncludeResolver {
                 (prop.value as JsonArray).valueList.forEach { el ->
                     val lit = el as? JsonStringLiteral ?: return@forEach
                     val target = resolveRelativeToFile(current.virtualFile, lit.value)
-                    results.add(Include(lit.value, target, lit))
                     if (withLogging) {
                         log.warn("Found external data file ${lit.value} inside ${current.name}")
                     }
-                    enqueueIfJson(target)
+                    enqueueIfJson(lit, target, false)
                 }
             }
 
@@ -102,11 +112,10 @@ object JsonIncludeResolver {
                         if (dataProp?.value is JsonStringLiteral) {
                             val path = (dataProp.value as JsonStringLiteral)
                             val target = resolveRelativeToFile(current.virtualFile, path.value)
-                            results.add(Include(path.value, target, path))
                             if (withLogging) {
                                 log.warn("Found external data file ${path.value} at ${conceptData.name}")
                             }
-                            enqueueIfJson(target)
+                            enqueueIfJson(path, target, true)
                         }
                     }
                 }
@@ -118,11 +127,10 @@ object JsonIncludeResolver {
                     val lit = headerVal as? JsonStringLiteral
                     if (lit != null) {
                         val target = resolveHeader(project, lit.value)
-                        results.add(Include(lit.value, target, lit))
                         if (withLogging) {
                             log.warn("Should not enter in the header-include code-path!!")
                         }
-                        enqueueIfJson(target)
+                        enqueueIfJson(lit, target, false)
                     }
                 }
             }
